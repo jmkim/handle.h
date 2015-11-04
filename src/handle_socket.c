@@ -1,3 +1,10 @@
+/*
+  handle_socket.c
+
+  Author: Jongmin Kim <jmkim@pukyong.ac.kr>
+  Written on November 4, 2015
+*/
+
 #include <string.h>
 #include <arpa/inet.h>
 

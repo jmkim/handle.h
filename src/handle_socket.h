@@ -1,3 +1,10 @@
+/*
+  handle_socket.h
+
+  Author: Jongmin Kim <jmkim@pukyong.ac.kr>
+  Written on November 4, 2015
+*/
+
 #ifndef _HANDLE_SOCKET_H
 #define _HANDLE_SOCKET_H
 

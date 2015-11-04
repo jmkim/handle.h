@@ -1,7 +1,11 @@
-#include <stdio.h>
+/*
+  handle_common.c
 
-#include "../../uh.h/src/uh_fgets.h"
-#include "../../uh.h/src/uh_trim.h"
+  Author: Jongmin Kim <jmkim@pukyong.ac.kr>
+  Written on November 4, 2015
+*/
+
+#include <stdio.h>
 
 #include "./handle_common.h"
 
