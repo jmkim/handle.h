@@ -77,7 +77,7 @@ void handle_put_address(struct sockaddr_in *__out, char *__ip_address, int __por
 {
     __out->sin_family       = AF_INET;
     __out->sin_port         = htons(__port);
-    __out->sin_addr.s_addr  = inet_addr(__ip_address);
+    __out->sin_addr.s_addr  = htonl(inet_addr(__ip_address));
 }
 
 void handle_get_address(char *__out, struct sockaddr_in *__ip_address)

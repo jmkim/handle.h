@@ -12,18 +12,25 @@
         * (Added)   `handle_socket_open_tcp()' and `handle_socket_open_udp()'.
         * (Changed) Now you can set protocol manually using `handle_socket_open()'.
                     Old one is moved to `handle_socket_open_tcp()'.
+    3. November 5, 2015
+        * (Fixed)   `accept()' returns -1 in `handle_socket_accept()'.
+                    `connect()' returns -1 in `handle_socket_connect()'.
+        * (Changed) `handle_socket_bind()' now seperated from `handle_socket_open()'.
+                    Length(sizeof-needed) argument removed.
 */
 
 #ifndef _HANDLE_SOCKET_H
 #define _HANDLE_SOCKET_H
 
-void    handle_socket_open_tcp  (int *__socket_fd_out, struct sockaddr_in *__addr);
-void    handle_socket_open_udp  (int *__socket_fd_out, struct sockaddr_in *__addr);
-void    handle_socket_open      (int *__socket_fd_out, struct sockaddr_in *__addr, int __domain, int __type, int __protocol);
+void    handle_socket_open_tcp  (int *__socket_fd_out);
+void    handle_socket_open_udp  (int *__socket_fd_out);
+void    handle_socket_open      (int *__socket_fd_out, int __domain, int __type, int __protocol);
 void    handle_socket_close     (int __socket_fd);
+void    handle_socket_bind      (int __socket_fd, struct sockaddr_in *__addr);
 void    handle_socket_listen    (int __socket_fd, int __wait_queue);
-void    handle_socket_accept    (int *__socket_client_fd_out, int __socket_server_fd, struct sockaddr_in *__client_addr, int *__client_addr_len_out);
-void    handle_socket_connect   (int __socket_fd, struct sockaddr_in *__server_addr, int __server_addr_len);
+void    handle_socket_accept    (int *__socket_client_fd_out, int __socket_server_fd, struct sockaddr_in *__client_addr);
+void    handle_socket_connect   (int __socket_fd, struct sockaddr_in *__server_addr);
+
 void    handle_put_address      (struct sockaddr_in *__out, char *__ip_address, int __port);
 void    handle_get_address      (char *__out, struct sockaddr_in *__ip_address);
 
