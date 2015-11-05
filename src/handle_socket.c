@@ -1,12 +1,17 @@
 /*
-  handle_socket.c
+    handle_socket.h
 
-  Author: Jongmin Kim <jmkim@pukyong.ac.kr>
-  Written on November 4, 2015
+    Author: Jongmin Kim <jmkim@pukyong.ac.kr>
+    Written on November 4, 2015
 
-  Revision history
-  1. November 5, 2015
-    * (Fixed) `accept()' returns the file descriptor, but is missing in `handle_socket_accept()'.
+    Revision history
+    1. November 5, 2015
+        * (Fixed)   `accept()' returns the file descriptor, but is missing in `handle_socket_accept()'.
+    2. November 5, 2015
+        * (Fixed)   `bind()' returns -1 in `handle_socket_open()'.
+        * (Added)   `handle_socket_open_tcp()' and `handle_socket_open_udp()'.
+        * (Changed) Now you can set protocol manually using `handle_socket_open()'.
+                    Old one is moved to `handle_socket_open_tcp()'.
 */
 
 #include <string.h>
@@ -15,15 +20,24 @@
 #include "./handle_common.h"
 #include "./handle_socket.h"
 
-void handle_socket_open(int *__socket_fd_out, struct sockaddr_in *__addr)
+void handle_socket_open_tcp(int *__socket_fd_out, struct sockaddr_in *__addr)
 {
-    int socket_fd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+    return handle_socket_open(__socket_fd_out, __addr, PF_INET, SOCK_STREAM, IPPROTO_TCP);
+}
+
+void handle_socket_open_udp(int *__socket_fd_out, struct sockaddr_in *__addr)
+{
+    return handle_socket_open(__socket_fd_out, __addr, PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+}
+
+void handle_socket_open(int *__socket_fd_out, struct sockaddr_in *__addr, int __domain, int __type, int __protocol)
+{
+    int socket_fd = socket(__domain, __type, __protocol);
     if(socket_fd == -1) { handle_error("handle_socket_open", "socket() failed to open."); return; }
-
-    if(bind(socket_fd, (struct sockaddr *)&__addr, sizeof(__addr)) == -1)
-    { handle_error("handle_socket_open", "bind() failed."); return; }
-
     *__socket_fd_out = socket_fd;
+
+    if(bind(socket_fd, (struct sockaddr *)__addr, sizeof(struct sockaddr_in)) == -1)
+    { handle_error("handle_socket_open", "bind() failed."); return; }
 }
 
 void handle_socket_close(int __socket_fd)
@@ -41,7 +55,6 @@ void handle_socket_accept(int *__socket_client_fd_out, int __socket_server_fd, s
 {
     int socket_client_fd = accept(__socket_server_fd, (struct sockaddr *)&__client_addr, __client_addr_len_out);
     if(socket_client_fd == -1) { handle_error("handle_socket_accept", "accept() failed."); return; }
-
     *__socket_client_fd_out = socket_client_fd;
 }
 
