@@ -3,6 +3,10 @@
 
   Author: Jongmin Kim <jmkim@pukyong.ac.kr>
   Written on November 4, 2015
+
+  Revision history
+  1. November 5, 2015
+    * (Fixed) `accept()' returns the file descriptor, but is missing in `handle_socket_accept()'.
 */
 
 #include <string.h>
@@ -33,10 +37,12 @@ void handle_socket_listen(int __socket_fd, int __wait_queue)
     { handle_error("handle_socket_listen", "listen() failed."); return; }
 }
 
-void handle_socket_accept(int __socket_fd, struct sockaddr_in *__client_addr, int *__client_addr_len_out)
+void handle_socket_accept(int *__socket_client_fd_out, int __socket_server_fd, struct sockaddr_in *__client_addr, int *__client_addr_len_out)
 {
-    if(accept(__socket_fd, (struct sockaddr *)&__client_addr, __client_addr_len_out) == -1)
-    { handle_error("handle_socket_accept", "accept() failed."); return; }
+    int socket_client_fd = accept(__socket_server_fd, (struct sockaddr *)&__client_addr, __client_addr_len_out);
+    if(socket_client_fd == -1) { handle_error("handle_socket_accept", "accept() failed."); return; }
+
+    *__socket_client_fd_out = socket_client_fd;
 }
 
 void handle_socket_connect(int __socket_fd, struct sockaddr_in *__server_addr, int __server_addr_len)
