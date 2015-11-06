@@ -14,16 +14,24 @@
 #include <time.h>
 #include <arpa/inet.h>
 
+#define HANDLE_HTTP_BUFFER_SIZE 100000
+
 #include "../src/handle_http.h"
 #include "../src/handle_socket.h"
 
 
 char *log_fname = "./sample_http_listener.log";
 
-void output_html(int __socket_client, char *__ip_address)
+void output_html(int __socket_client, char **__client_info)
 {
     char buffer[HANDLE_HTTP_BUFFER_SIZE];
-    sprintf(buffer, "<!DOCTYPE html>\n<html>\n<head>\n<title>Your IP is: %s</title>\n</head>\n<body>\n<p>%s</p>\n</body>\n</html>\n", __ip_address, __ip_address);
+    sprintf(buffer,
+#include "./sample_http_listener_output_html.c"
+        , __client_info[0] /* IP Address */
+        , __client_info[0]
+        , __client_info[1] /* User-Agent */
+        , __client_info[2] /* REQUEST */
+    );
     write(__socket_client, buffer, strlen(buffer));
 }
 
@@ -62,13 +70,13 @@ int main(int argc, char **argv)
 
             FILE *log_f = fopen(log_fname, "a");
             int status = 0, byte_sent = 0;
-            char remote_user[] = "-", http_referer[] = "-", http_user_agent[] = "-";
+            char remote_user[] = "-", request_head[] = "-", http_referer[] = "-", http_user_agent[] = "-";
             fprintf(log_f,
-                "%s - %s [%s]"/*\"%s\"*/" %d %d \"%s\" \"%s\"\n"
+                "%s - %s [%s] \"%s\" %d %d \"%s\" \"%s\"\n"
                 , remote_addr
                 , remote_user
                 , time_local
-                //, request
+                , request_head
                 , status
                 , byte_sent
                 , http_referer
@@ -76,7 +84,8 @@ int main(int argc, char **argv)
             );
             fclose(log_f);
 
-            output_html(socket_client, remote_addr);
+            char *output[3] = { remote_addr, http_user_agent, request };
+            output_html(socket_client, output);
             handle_socket_close(socket_client);
         }
         else
